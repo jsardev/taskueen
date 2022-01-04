@@ -1,0 +1,9 @@
+{
+  "name": "clinguin",
+  "version": "0.0.0",
+  "description": "CLI Toolkit",
+  "main": "index.js",
+  "repository": "git@github.com:sarneeh/clinguin.git",
+  "author": "Jakub Sarnowski <hello@jsarnowski.com>",
+  "license": "MIT"
+}
