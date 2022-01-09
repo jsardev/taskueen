@@ -63,6 +63,6 @@ export const createTask = (task: Task, parentId?: string): InternalTask => {
     id,
     parentId,
     task: Array.isArray(task.task) ? task.task.map(childTask => createTask(childTask, id)) : task.task,
-    state: TaskState.IDLE
+    state: TaskState.PENDING
   };
 };
