@@ -6,13 +6,17 @@ import { Task } from './types';
 
 export const run = (tasks: Task[]) => {
   const internalTasks = tasks.map(task => createTask(task));
-  const render = createRenderer(internalTasks);
+  const { onNext, onError, onComplete } = createRenderer(internalTasks);
 
   from(internalTasks)
     .pipe(
-      tap(task => render(task)),
+      tap(task => onNext(task)),
       map(task => createTask$(task)),
       concatAll()
     )
-    .subscribe(render);
+    .subscribe({
+      next: onNext,
+      error: onError,
+      complete: onComplete
+    });
 };

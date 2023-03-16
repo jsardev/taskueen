@@ -1,9 +1,9 @@
-import logUpdate from 'log-update';
 import indentString from 'indent-string';
 import { dots } from 'cli-spinners';
+import logSymbols from 'log-symbols';
+import logUpdate, { clear } from 'log-update';
 
 import { InternalTask, InternalTaskRendererState, TaskState } from './types';
-import logSymbols from 'log-symbols';
 
 const createRendererState = (tasks: InternalTask[], depth: number = 0): InternalTaskRendererState =>
   tasks.reduce((state, task) => {
@@ -24,7 +24,9 @@ const createRendererState = (tasks: InternalTask[], depth: number = 0): Internal
 const getSymbol = (taskState: TaskState, frameIndex: number) => ({
   [TaskState.PENDING]: '',
   [TaskState.IN_PROGRESS]: dots.frames[frameIndex],
-  [TaskState.COMPLETED]: logSymbols.success
+  [TaskState.COMPLETED]: logSymbols.success,
+  [TaskState.FAILED_PARTIALLY]: logSymbols.warning,
+  [TaskState.FAILED]: logSymbols.error
 })[taskState];
 
 export const createRenderer = (tasks: InternalTask[]) => {
@@ -42,14 +44,20 @@ export const createRenderer = (tasks: InternalTask[]) => {
     logUpdate(output.join('\n'));
 
     frameIndex = isLastSpinnerFrame ? 0 : frameIndex + 1;
-
-    if (Object.values(state).every(task => task.state === TaskState.COMPLETED)) {
-      clearInterval(interval);
-    }
   }, dots.interval);
 
 
-  return (task: InternalTask) => {
-    state[task.id] = { ...state[task.id], ...task };
+  return {
+    onNext: (task: InternalTask) => {
+      state[task.id] = { ...state[task.id], ...task };
+    },
+    onError: (e) => {
+      console.log('onerror',e)
+      clearInterval(interval);
+    },
+    onComplete: () => {
+      console.log('oncomplete')
+      clearInterval(interval);
+    }
   };
 };
